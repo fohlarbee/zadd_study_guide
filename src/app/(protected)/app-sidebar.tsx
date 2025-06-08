@@ -50,7 +50,6 @@ export function AppSideBar({isOpen, setIsOpen, shouldShowCard, setShouldShowCard
   const pathname = usePathname();
   const { open } = useSidebar();
 
-  console.log("Sidebar open state:", isOpen, setIsOpen, setShouldShowCard);
 
   React.useEffect(() => {
 
@@ -106,7 +105,7 @@ export function AppSideBar({isOpen, setIsOpen, shouldShowCard, setShouldShowCard
                   :
                   (
                     <>
-                     <Link href="/" className="flex items-center gap-2">
+                     <Link href="/create" className="flex items-center gap-2">
                       <PlusSquareIcon size={24} />
                           Create New
                       </Link>

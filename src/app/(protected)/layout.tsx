@@ -56,7 +56,7 @@ const SidebarLayout = ({children}: Props) => {
                                         {/* <Separator/>  */}
                                         <>
                                         <Button variant="outline" className="w-full mt-2" onClick={() => setIsLayerOpen(false)}>
-                                            <Link href="/" className="flex items-center gap-2">
+                                            <Link href="/create" className="flex items-center gap-2 w-full">
                                                 <PlusSquareIcon size={24} />
                                                     Create New
                                             </Link>
