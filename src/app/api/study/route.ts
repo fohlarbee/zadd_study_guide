@@ -1,20 +1,35 @@
 import db from "@/lib/db";
 import { StudyMaterial } from "@/lib/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { desc, eq } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async () => {
+export const GET = async (req: NextRequest) => {
     const { userId } = await auth();
     if (!userId) 
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const studyMaterials = 
-    await db
-    .select()
-    .from(StudyMaterial)
-    .where(eq(StudyMaterial.userId, userId));
+    if (req) {
+        const reqUrl = req.url;
+        const searchParams = new URL(reqUrl).searchParams;
+        
 
-    console.log("Fetched Study Materials:", studyMaterials);
-    return NextResponse.json({ studyMaterials: studyMaterials || [] }, { status: 200 });
+        const studyId = searchParams.get("studyId");
+
+        if (studyId) {
+            const studyMaterial = await db.select().from(StudyMaterial).where(
+                eq(StudyMaterial.courseId, studyId!),
+            );
+            return NextResponse.json({ studyMaterial: studyMaterial[0] }, { status: 200 });
+        }
+    }
+
+    const studyMaterials = 
+        await db
+        .select()
+        .from(StudyMaterial)
+        .where(eq(StudyMaterial.userId, userId))
+        .orderBy(desc(StudyMaterial.createdAt));
+
+    return NextResponse.json({ studyMaterials: studyMaterials }, { status: 200 });
 }

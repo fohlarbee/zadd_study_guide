@@ -37,4 +37,26 @@ import {
     return result;
   } 
 
+  export const generateStudyMaterialChapters = async (userPrompt: string) => {
+    const contents = [
+      {
+        role: 'user',
+        parts: [{text:userPrompt}]
+      }
+    ];
+    const studyMaterialChapters = await ai.models.generateContentStream({
+      model,
+      config,
+      contents
+    });
+
+    let result = '';
+    for await (const chunk of studyMaterialChapters){
+      result += chunk.text || '';
+      
+    }
+    console.log("Generated Study Material Chapters:", result);
+    return result;
+  }
+
 

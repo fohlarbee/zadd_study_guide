@@ -2,17 +2,18 @@
 import { useLocalStorage } from "usehooks-ts";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { DrizzleStudyMaterial } from "../db/schema";
+import { DrizzleStudyMaterial } from "@/lib/db/schema";
 
 export type UseStudyMaterialsResult = {
     studyMaterials: DrizzleStudyMaterial[];
     studyMaterial: DrizzleStudyMaterial | undefined;
     setStudyMaterialId: (id: string) => void;
     studyMaterialId: string;
+    setStudyMaterial: (material: DrizzleStudyMaterial | undefined) => void; 
 }
 const useStudyMaterials = ():UseStudyMaterialsResult => {
     const [studyMaterialId, setStudyMaterialId] = useLocalStorage<string>('study-material-id', '');
-
+    const [studyMaterial, setStudyMaterial] = useLocalStorage<DrizzleStudyMaterial | undefined>('study-material', undefined);
     const {data: studyMaterials = []} = useQuery({
         queryKey: ['studyMaterials'],
         queryFn: async () => {
@@ -22,9 +23,9 @@ const useStudyMaterials = ():UseStudyMaterialsResult => {
     });
     const arrayMaterials = Array.isArray(studyMaterials) ? studyMaterials : [];
 
-    const studyMaterial = arrayMaterials.find((material) => material.id === studyMaterialId);
+    //  studyMaterial = arrayMaterials.find((material) => material.id === studyMaterialId);
 
-    return {studyMaterials: arrayMaterials, studyMaterial, setStudyMaterialId, studyMaterialId};
+    return {studyMaterials: arrayMaterials, studyMaterial, setStudyMaterialId, studyMaterialId, setStudyMaterial};
 
 }
 

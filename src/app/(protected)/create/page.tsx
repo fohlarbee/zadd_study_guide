@@ -9,7 +9,7 @@ import { Loader2Icon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import useRefresh from '@/lib/hooks/useRefresh';
+import useRefresh from '@/hooks/useRefresh';
 
 const Create = () => {
     const [step, setStep] = useLocalStorage<number>("step", 0);
@@ -45,7 +45,6 @@ const Create = () => {
             ...prevData,
             [fieldName]: fieldValue
         }));
-        console.log("Form Data:", formData);
     }
     const generateStudyOutline = async () => {
        await mutation.mutateAsync(formData);

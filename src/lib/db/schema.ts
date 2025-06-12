@@ -1,4 +1,4 @@
-import { boolean, json, pgTable, varchar } from "drizzle-orm/pg-core";
+import { boolean, json, pgTable, text, varchar } from "drizzle-orm/pg-core";
 
 export const Users = pgTable('users', {
     id: varchar('id', {length:255}).primaryKey(),
@@ -19,4 +19,20 @@ export const StudyMaterial = pgTable('studyMaterial', {
     courseLayout: json(),
     status:varchar('status').default('Generating'),
     userId:varchar('user_id').references(() => Users.id, {onDelete: 'cascade'}).notNull(),
+    createdAt: varchar('created_at', {length: 255}).notNull().default('now()'),
+
+});
+
+export const studyNotes = pgTable('study_notes', {
+    id: varchar('id', {length:255}).primaryKey(),
+    studyId: varchar().notNull(),
+    chapterId: varchar().notNull(),
+    notes: text()
+});
+
+export const Flashcards = pgTable('flashcards', {
+    id: varchar('id', {length: 255}).primaryKey(),
+    studyId: varchar('study_id', {length: 255}).notNull(),
+    content: json().notNull(),
+    createdAt: varchar('created_at', {length: 255}).notNull().default('now()'),
 });

@@ -3,6 +3,7 @@ import { Progress } from '@/components/ui/progress';
 import { DrizzleStudyMaterial } from '@/lib/db/schema'
 import { RefreshCwIcon } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react'
 
 
@@ -29,12 +30,14 @@ const StudyCourseListItem = ({studyMaterial}: StudyCourseListItemProps) => {
                     <Button 
                     disabled={true}
                     variant='outline' className='animate-pulse text-sm font-medium shadow-lg cursor-pointer '>
-                        <RefreshCwIcon className='text-primary'/>
+                        <RefreshCwIcon className='text-primary animate-spin'/>
                         Generating...
                     </Button>
                 </>)
                 : (<>
+                <Link href={`/study/${studyMaterial.courseId}`}>
                   <Button className='text-sm font-medium shadow-lg cursor-pointer'>View</Button>
+                </Link>
 
                 </>)
                 }

@@ -49,6 +49,7 @@ export const items = [
 export function AppSideBar({isOpen, setIsOpen, shouldShowCard, setShouldShowCard}: {isOpen:boolean, setIsOpen:(open: boolean) => void, shouldShowCard: boolean, setShouldShowCard: (show: boolean) => void}) {
   const pathname = usePathname();
   const { open } = useSidebar();
+  console.log("Sidebar open state:", setIsOpen);
 
 
   React.useEffect(() => {

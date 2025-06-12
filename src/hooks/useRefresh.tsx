@@ -1,4 +1,4 @@
-import { queryClient } from "../providers/queryProvider"
+import { queryClient } from "@/lib/providers/queryProvider";
 
 const useRefresh = () => {
     return async () => {
