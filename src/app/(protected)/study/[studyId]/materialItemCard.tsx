@@ -68,7 +68,8 @@ const MaterialItemCard = ({ item, studyTypeContent, studyId, studyMaterial, refr
             onClick={item.type === 'qa' ? undefined : generateContent}
             disabled={loading || item.type === 'qa'}
             variant={'outline'}
-            className='text-xs md:text-sm text-primary hover:bg-primary hover:text-secondary transition-colors duration-200 flex justify-center mt-auto w-[90%]'
+            className='text-xs md:text-sm text-primary
+            cursor-pointer hover:bg-primary hover:text-secondary transition-colors duration-200 flex justify-center mt-auto w-[90%]'
           >
             {loading && item.type !== 'qa' && <RefreshCcwIcon className='animate-spin' />}
             {item.type === 'qa' ? 'Coming soon' : 'Generate'}
@@ -76,7 +77,7 @@ const MaterialItemCard = ({ item, studyTypeContent, studyId, studyMaterial, refr
         )
       : (
         <Link href={`/study/${studyId}/${item.link}`} className='w-full'>
-          <Button variant={'outline'} className='text-xs md:text-sm text-primary hover:bg-primary hover:text-secondary transition-colors duration-200
+          <Button variant={'outline'} className='cursor-pointer text-xs md:text-sm text-primary hover:bg-primary hover:text-secondary transition-colors duration-200
          flex justify-center mt-auto w-[90%]'>
              {item.name}
           </Button>

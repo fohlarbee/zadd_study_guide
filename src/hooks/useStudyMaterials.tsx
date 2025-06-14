@@ -16,6 +16,7 @@ const useStudyMaterials = ():UseStudyMaterialsResult => {
             queryKey: ['studyMaterials'],
             queryFn: async () => {
                 const res = await axios.get('/api/study');
+                setStudyMaterials(res.data.studyMaterials);
                   setTotalSTM(res.data.studyMaterials.length);
                 return res.data.studyMaterials as DrizzleStudyMaterial[];
             }

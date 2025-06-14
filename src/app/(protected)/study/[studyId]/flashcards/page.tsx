@@ -11,6 +11,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import type {  UseEmblaCarouselType } from 'embla-carousel-react';
+import StepProgress from '../stepProgress';
 
 export type Flashcard = {
     front: string,
@@ -60,30 +61,22 @@ const FlashCards = () => {
       })
     },[api])
   return (
-    <div>
-      <h2 className='font-bold'>Flashcards</h2>
-      <p className='mb-5'>The best way to learn is through active recall.</p>
-        <div className='flex gap-2 items-center justify-evenly'>
-
-            {flashcards?.content.slice(0, -1).map((n, i) => (
-
-                  <div
-                      key={i}
-                      className={`
-                          flex-1 min-w-[6px] w-full max-w-[110px] h-2 rounded-md justify-center mt-auto mb-auto
-                          ${i <= stepCount ? 'bg-primary' : 'bg-gray-200'}
-                          mx-0.5
-                      `}
-                      
-                  >
-                  </div>
-            ))}
-
-
-          
-          
-
-        </div>
+    <div >
+      <h2 className='font-bold text-center'>Flashcards</h2>
+      <p className='mb-5 text-center'>The best way to learn is through active recall.</p>
+       {flashcards && (
+          <StepProgress
+            data={flashcards?.content.map(item => item.front)}
+            stepCount={stepCount}
+            setStepCount={(idx: number) => {
+              setStepCount(idx);
+              if (api) {
+                api.scrollTo(idx);
+              }
+            }}
+          />
+        )}
+        
 
       <div className="flex-center items-center justify-center mt-10">
       
@@ -93,20 +86,36 @@ const FlashCards = () => {
             <CarouselContent >
 
               {flashcards?.content.map((f, i) => (
-                <CarouselItem  key={i} className='flex w-full items-center justify-center'>
-                  <FlashcardItem 
-                  flashcard={f} isFlipped={isFlipped} handleClick={handleClick}/>
-              
+                <CarouselItem key={i} className='flex w-full items-center justify-center relative'>
+                  <FlashcardItem
+                   flashcard={f}
+                    isFlipped={isFlipped}
+                    handleClick={handleClick}
+
+                  />
+                  <div className="absolute top-1/2 -translate-y-1/2 left-4 z-10 hidden md:block">
+                    <CarouselPrevious
+                      onClick={() => {
+                        if (api) {
+                          api.scrollTo(Math.max(0, stepCount - 1));
+                        }
+                      }}
+                      className="bg-white shadow-md rounded-full p-2 hover:bg-gray-100"
+                    />
+                  </div>
+                  <div className="absolute top-1/2 -translate-y-1/2 right-4 z-10 hidden md:block">
+                    <CarouselNext
+                      onClick={() => {
+                        if (api && flashcards?.content) {
+                          api.scrollTo(Math.min(flashcards.content.length - 1, stepCount + 1));
+                        }
+                      }}
+                      className="bg-white shadow-md rounded-full p-2 hover:bg-gray-100"
+                    />
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-              <div className="absolute top-1/2 -translate-y-1/2 left-4 z-10 hidden md:block ">
-              <CarouselPrevious
-              onClick={() => setStepCount(stepCount - 1)} className="bg-white shadow-md rounded-full p-2 hover:bg-gray-100" />
-              </div>
-              <div className="absolute top-1/2 -translate-y-1/2 right-4 z-10 hidden md:block">
-              <CarouselNext onClick={() => setStepCount(stepCount + 1)} className="bg-white shadow-md rounded-full p-2 hover:bg-gray-100" />
-              </div>
 
           </Carousel>
          
