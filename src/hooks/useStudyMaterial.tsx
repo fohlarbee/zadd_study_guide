@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { DrizzleStudyMaterial } from "@/lib/db/schema";
 import { useParams } from "next/navigation";
+import React from 'react';
 
 export type UseStudyMaterialsResult = {
     studyMaterial: DrizzleStudyMaterial;
@@ -28,7 +29,10 @@ const useStudyMaterial = ():UseStudyMaterialsResult => {
             return null;
         }
     });
-
+     // Sync fetched data to localStorage
+    React.useEffect(() => {
+        if (data) setStudyMaterial(data);
+    }, [data, setStudyMaterial]);
     return { studyMaterial, setStudyMaterialId, studyMaterialId, setStudyMaterial};
 
 }

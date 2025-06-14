@@ -8,7 +8,7 @@ type StepProgressProps = {
 }
 const StepProgress = ({ stepCount, setStepCount, data }: StepProgressProps) => {
   return (
-    <div className='flex gap-2 md:gap-5 items-center'>
+    <div className='flex gap-1 md:gap-5 items-center'>
         {stepCount !== 0 && <Button variant='outline' size='icon'
         className='text-xs text-center '
         onClick={() => setStepCount(stepCount - 1)}>Prev</Button>}

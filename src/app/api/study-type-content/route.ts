@@ -31,6 +31,7 @@ export const POST = async(req: NextRequest) => {
         type,
         studyId,
     }).returning({id: StudyTypeContent.id});
+    console.log('res', res);
 
 
         // Trigger Inngest Function to generate FlashCards
