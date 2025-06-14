@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import useStudyMaterials from "@/hooks/useStudyMaterials";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -49,7 +50,7 @@ export const items = [
 export function AppSideBar({isOpen, setIsOpen, shouldShowCard, setShouldShowCard}: {isOpen:boolean, setIsOpen:(open: boolean) => void, shouldShowCard: boolean, setShouldShowCard: (show: boolean) => void}) {
   const pathname = usePathname();
   const { open } = useSidebar();
-  console.log("Sidebar open state:", setIsOpen);
+  const { totalSTM } = useStudyMaterials();
 
 
   React.useEffect(() => {
@@ -157,9 +158,9 @@ export function AppSideBar({isOpen, setIsOpen, shouldShowCard, setShouldShowCard
                   : "opacity-0 translate-y-4 scale-95 pointer-events-none"
               )}
             >
-              <h2 className="text-md mb-2 font-semibold">Available Credits: 5</h2>
-              <Progress value={30} className="mb-2" />
-              <p className="text-sm text-muted-foreground">You have 5 credits remaining</p>
+              <h2 className="text-md mb-2 font-semibold">Available Credits: {5 - totalSTM}</h2>
+              <Progress value={(totalSTM / 5) * 100} className="mb-2" />
+              <p className="text-sm text-muted-foreground">{totalSTM} out of 5 credits used</p>
               <Link className="text-xs text-primary" href="/upgrade">
                 Upgrade to create more
               </Link>

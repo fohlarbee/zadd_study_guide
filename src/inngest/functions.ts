@@ -1,7 +1,7 @@
 import { inngest } from "./client";
-import { DrizzleStudyMaterial, StudyMaterial, studyNotes, Users } from "@/lib/db/schema";
+import { DrizzleStudyMaterial, StudyMaterial, studyNotes, StudyTypeContent, Users } from "@/lib/db/schema";
 import db from "@/lib/db";
-import { eq } from "drizzle-orm";
+import {  eq } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs/server";
 import { generateChapterContentPrompt } from "@/lib/prompt";
 import { generateStudyGuide } from "@/lib/GenerateCourse";
@@ -22,9 +22,8 @@ export const createNewUser = inngest.createFunction(
   {event:'user.create'},
   async ({event, step}) => {
     // Get Event Data
-    // console.log(event.data);
     const {userId, email} = event.data;
-    const result = await step.run('Check user and send mail', async () => {
+    await step.run('Check user and send mail', async () => {
 
       if (!userId || !email) throw new Error("User not found");
 
@@ -43,7 +42,6 @@ export const createNewUser = inngest.createFunction(
           return user[0];
       }
       });
-      console.log("user", result);
       return "Success";
   }
 
@@ -68,7 +66,7 @@ export const generateNotes = inngest.createFunction(
 
     // Generate notes for each chapters
     try {
-      const notes =  await step.run("Generate study notes", async() => {
+      await step.run("Generate study notes", async() => {
           const courseLayout = studyMaterial?.courseLayout as CourseLayout;
           const chapters = courseLayout?.chapters;
           let index = 0;
@@ -84,7 +82,6 @@ export const generateNotes = inngest.createFunction(
                 const res = await generateStudyGuide(prompt);
                 // Sanitize the response
                 
-                // console.log('Generated Notes for Chapter:', c.chapterTitle, res);
                 await db.insert(studyNotes).values({
                   id: uuid4(), 
                   studyId: studyMaterial.courseId,
@@ -97,20 +94,17 @@ export const generateNotes = inngest.createFunction(
           }
           return 'Completed'
       });
-     console.log('All notes generated', notes);
 
 
      // Update staus to Ready
-    const studyMaterialUpdate = await step.run('Update StudyLayout status', async() => {
-      const res = await db.update(StudyMaterial).set({
-        status:"Ready"
-      }).where(eq(StudyMaterial.courseId, studyMaterial.courseId));
-      console.log('Res', res);
-      return 'Success'
-    });
+    await step.run('Update StudyLayout status', async() => {
+      await db.update(StudyMaterial).set({
+          status:"Ready"
+        }).where(eq(StudyMaterial.courseId, studyMaterial.courseId));
+        return 'Success'
+      });
 
 
-    console.log('Study Material Update:', studyMaterialUpdate);
 
     return 'Successful'
       
@@ -128,7 +122,28 @@ export const generateStudyTypeContent = inngest.createFunction(
   {id: 'generate_study_type_content'},
   {event: 'study_type_content.generate'},
   async({event, step}) => {
-    const {studyType, prompt, studyId} = event.data;
+    const { prompt, recordId} = event.data;
+
+
+    const contentRes = await step.run('Generate FlashCards', async() => {
+      const res = await generateStudyGuide(prompt);
+      const AIRes = JSON.parse(res);
+      console.log('Content Material Generated:', AIRes);  
+      return AIRes;
+
+
+    });
+    // Save the generated flashcards to the database
+    await step.run('Save FlashCards to DB', async() => {
+       await db.update(StudyTypeContent).set({
+        content: contentRes,
+        status: 'Ready'
+      })
+      .where(eq(StudyTypeContent.id, recordId));
+      
+
+      return 'Database Updated';
+    });
     
   }
 

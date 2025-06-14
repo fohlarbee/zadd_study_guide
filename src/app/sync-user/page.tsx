@@ -17,7 +17,6 @@ const SyncUser = async() => {
 
     const res = await axios.post(`${baseUrl}/api/create-user`, {clerkUser});
 
-    console.log("User synced with Inngest:", res.data);
 
     return redirect('/dashboard');
 }

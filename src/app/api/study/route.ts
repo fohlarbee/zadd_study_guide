@@ -29,7 +29,7 @@ export const GET = async (req: NextRequest) => {
         .select()
         .from(StudyMaterial)
         .where(eq(StudyMaterial.userId, userId))
-        .orderBy(desc(StudyMaterial.createdAt));
+        .orderBy(desc(StudyMaterial.created_at));
 
     return NextResponse.json({ studyMaterials: studyMaterials }, { status: 200 });
 }

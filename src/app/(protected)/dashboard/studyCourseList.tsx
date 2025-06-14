@@ -7,15 +7,16 @@ import { RefreshCcwIcon } from 'lucide-react';
 import useRefresh from '@/hooks/useRefresh';
 import { useLocalStorage } from 'usehooks-ts';
 
+
 const StudyCourseList = () => {
     const {studyMaterials } = useStudyMaterials();
-    const [isMaterialReady, setIsMaterialReady] = useLocalStorage<boolean>('isMaterialReady', false)
+    const [isMaterialsReady, setIsMaterialsReady] = useLocalStorage<boolean>('isMaterialsReady', false)
     const refresh = useRefresh();
     
     const refreshStates = async () => {
-      setIsMaterialReady(true);
+      setIsMaterialsReady(true);
       await refresh();
-      setIsMaterialReady(false);
+      setIsMaterialsReady(false);
     };
 
 
@@ -29,7 +30,7 @@ const StudyCourseList = () => {
         Refresh</Button>
       </div>
        <div className='grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2'>
-        {!isMaterialReady ? studyMaterials!.map((m, i) => 
+        {!isMaterialsReady ? studyMaterials!.map((m, i) => 
            (
             <StudyCourseListItem key={i}  studyMaterial={m}/>
           )

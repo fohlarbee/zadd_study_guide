@@ -91,3 +91,43 @@ Now generate the HTML output.
 `;
 };
 
+export const flashcardFormatPrompt = (
+  {topics}: {topics:string[]} ) => {
+  return `
+  You are a ai specialized in generating educational flashcards.
+  Generate a set of flashcards based on the following topics:
+  ${topics?.map((topic) => `${topic}`).join(',')}
+
+  No intro, no explanations, just the array in this format:
+  [
+  {
+    "front": "<A concise question, term, or prompt>",
+    "back": "<A clear and correct answer or explanation>"
+  }
+  // ... up to 15 items max
+]
+  Avoid extra commentary — return only the JSON array.
+  `
+}
+
+export const quizFormatPrompt = (
+  {topics}: {topics: string[]}
+) => {
+  return `
+  You are a ai specialized in generating educational quizzes.
+  Generate a quiz based on the following topics:
+
+  ${topics?.map((topic) => `${topic}`).join(',')}
+
+  No intro, no explanations, just the array in this format:
+  [
+  {
+    "question": "<The quiz question>",
+    "options": ["<Option 1>", "<Option 2>", "<Option 3>", "<Option 4>"],
+    "answer": "<The correct answer>"
+  }
+  // ... up to 10 items max
+]
+  Avoid extra commentary — return only the JSON array.
+  `
+}

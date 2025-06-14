@@ -20,12 +20,12 @@ const useStudyMaterial = ():UseStudyMaterialsResult => {
     const {data } = useQuery({
         queryKey: ['studyMaterial'],
         queryFn: async () => {
-             if (!studyId) return undefined;
             const res =  await axios.get(`/api/study?studyId=${studyId}`);
-            // console.log('useStudyMaterial res', res);
-            setStudyMaterial(res.data.studyMaterial);
-            // console.log('useStudyMaterial', res.data.studyMaterial);
-            return res.data.studyMaterial as DrizzleStudyMaterial;
+            if (res.data.studyMaterial) {
+                setStudyMaterialId(res.data.studyMaterial.courseId);
+                return res.data.studyMaterial as DrizzleStudyMaterial;
+            }
+            return null;
         }
     });
 

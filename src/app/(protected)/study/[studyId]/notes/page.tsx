@@ -9,38 +9,37 @@ import { useLocalStorage } from 'usehooks-ts'
 
 type Note = {
     notes: string;
-    // add other properties if needed
 };
 
 const Notes = () => {
     const {studyId} = useParams();
     const [notes, setNotes] = useLocalStorage<Note[]>('notes', []);
-    const [stepCount, setStepCount] = useLocalStorage<number>('stepCount', 5);
+    const [stepCount, setStepCount] = useLocalStorage<number>('stepCount', 0);
     const router = useRouter();
     const getNotes = async () => {
         const res = await axios.post('/api/study-type', {
             studyId,
-            studyType: "Notes"
+            studyType: "notes"
         });
-        console.log(res.data);
         setNotes(res.data)
     }
     React.useEffect(() => {
         getNotes();
     }, []);
   return (
-    <div className='w-[90%] bg-blue-400'>
-        <div className='flex gap-2 items-center  justify-center bg-red-500'>
+    <div className=''>
+        <div className='flex gap-2 items-center  justify-evenly'>
                 
-            {stepCount !== 0 &&
+            {notes && stepCount !== 0 &&
 
              <Button 
                 onClick={() => setStepCount(stepCount - 1)}
-            variant='outline' size='icon'>
+            variant='ghost' size='icon'>
                 <ArrowLeftIcon/>
             </Button>
             }
-            {notes?.map((n, i) => (
+
+             {notes?.map((n, i) => (
 
                     <div
                         key={i}
@@ -53,27 +52,31 @@ const Notes = () => {
                     >
                     </div>
             ))}
-            {stepCount !== notes.length &&
+           
+            
+             {notes && stepCount !== notes.length &&
             
             <Button 
                 onClick={() => setStepCount(stepCount + 1)}
-            variant='outline' size='icon'>
+            variant='ghost' size='icon'>
                                 <ArrowRightIcon/>
             </Button>
             }
-            
+           
             
 
         </div>
         <div className='mt-5 w-full flex justify-center'>
             <div
-            className='flex flex-col w-[90%] max-w-[90vw] sm:max-w-[90%] overflow-x-hidden'
+            className='flex flex-col w-[90%] max-w-[90vw] sm:max-w-[100%] '
             dangerouslySetInnerHTML={{ __html: cleanNotesHTML(notes[stepCount]?.notes) }}
             />
 
-            {stepCount === notes.length &&
-            <div className='flex flex-col items-center justify-center gap-2 mt-5'>
-                <h2>End of Notes</h2>
+           
+        </div>
+         {stepCount === notes?.length &&
+            <div className='flex flex-col justify-center items-center gap-2 mt-5'>
+                <h2 className=''>End of Notes</h2>
                 <Button
                 className='cursor-pointer'
                 onClick={() => router.back()}
@@ -82,7 +85,6 @@ const Notes = () => {
                 </Button>
             </div>
             }
-        </div>
     </div>
   )
 }

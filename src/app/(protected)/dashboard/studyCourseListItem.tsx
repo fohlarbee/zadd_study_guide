@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import useStudyMaterial from '@/hooks/useStudyMaterial';
 import { DrizzleStudyMaterial } from '@/lib/db/schema'
 import { RefreshCwIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -11,6 +12,8 @@ type StudyCourseListItemProps = {
     studyMaterial: DrizzleStudyMaterial;
 }
 const StudyCourseListItem = ({studyMaterial}: StudyCourseListItemProps) => {
+        const {setStudyMaterialId} = useStudyMaterial();
+    
   return (
     <div className='border border-sidebar-border rounded-lg p-5 transition-colors duration-200 cursor-pointer hover:bg-secondary shadow-lg'>
         <div>
@@ -36,7 +39,9 @@ const StudyCourseListItem = ({studyMaterial}: StudyCourseListItemProps) => {
                 </>)
                 : (<>
                 <Link href={`/study/${studyMaterial.courseId}`}>
-                  <Button className='text-sm font-medium shadow-lg cursor-pointer'>View</Button>
+                  <Button 
+                  onClick={() => setStudyMaterialId(studyMaterial.courseId)}
+                  className='text-sm font-medium shadow-lg cursor-pointer'>View</Button>
                 </Link>
 
                 </>)

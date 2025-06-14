@@ -20,7 +20,6 @@ export const POST = async (req: Request) => {
 
     let  guide = await generateStudyGuide(prompt);
     guide = guide.trim().replace(/^```(?:json)?|```$/g, ''); // Remove code block markers
-    console.log("Sanitized guide output:", guide);
     const res = JSON.parse(guide);
     
 
@@ -43,6 +42,5 @@ export const POST = async (req: Request) => {
         }
     });
 
-    console.log('response from generate notes', notes)
     return NextResponse.json({res:dbResult[0]}, { status: 200 });
 }

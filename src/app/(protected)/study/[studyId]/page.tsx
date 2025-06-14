@@ -8,21 +8,13 @@ import ChapterList, { CourseLayout } from './chapterList';
 const StudyPage = () => {
     const { studyMaterial} = useStudyMaterial();
   
-  
-  // const test = async () => {
-  //   const res =  await axios.get(`/api/study?studyId=${studyId}`);
-  //   console.log('API Response:', res.data);
-  // }
-  // React.useEffect(() => {
-  //   test();
-  // },[])
   return (
-    <div className='lg:px-20 mt-10 w-full '>
+    <div className=' mt-10 w-full '>
        {/* StudyIntro */}
        {studyMaterial && <CourseIntroCard studyMaterial={studyMaterial} />}
 
        {/* StudyMaterialOption */}
-       <StudyMaterialSection studyId={studyMaterial!.courseId}/>
+       <StudyMaterialSection studyId={studyMaterial!.courseId} studyMaterial={studyMaterial} />
 
         {/* ChapterList */}
        {studyMaterial && (

@@ -55,7 +55,6 @@ import {
       result += chunk.text || '';
       
     }
-    console.log("Generated Study Material Chapters:", result);
     return result;
   }
 

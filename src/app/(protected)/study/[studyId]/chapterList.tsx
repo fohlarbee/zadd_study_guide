@@ -28,7 +28,7 @@ const ChapterList = ({ studyMaterial }: Props) => {
         <h2 className='font-bold text-sm md:text-lg'>Chapters</h2>
         
         <div className='mt-4'>
-         {chapters.map((c,i) => {
+         {chapters?.map((c,i) => {
           const [chapterNumber, ...chapterTitleParts] = c.chapterTitle.split(":");
           const chapterTitle = chapterTitleParts.join(":").trim();
           return (

@@ -1,11 +1,11 @@
-import { boolean, json, pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { boolean, json, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const Users = pgTable('users', {
     id: varchar('id', {length:255}).primaryKey(),
     name: varchar('name', {length: 255}).notNull(),
     email: varchar('email', {length: 255}).notNull().unique(),
     isMember: boolean('is_member').notNull().default(false),
-    createdAt: varchar('created_at', {length: 255}).notNull().default('now()'),
+    created_at: timestamp("created_at", { withTimezone: false }).defaultNow(),
 
 });
 
@@ -19,20 +19,23 @@ export const StudyMaterial = pgTable('studyMaterial', {
     courseLayout: json(),
     status:varchar('status').default('Generating'),
     userId:varchar('user_id').references(() => Users.id, {onDelete: 'cascade'}).notNull(),
-    createdAt: varchar('created_at', {length: 255}).notNull().default('now()'),
-
+    created_at: timestamp("created_at", { withTimezone: false }).defaultNow(),
 });
 
 export const studyNotes = pgTable('study_notes', {
     id: varchar('id', {length:255}).primaryKey(),
     studyId: varchar().notNull(),
     chapterId: varchar().notNull(),
-    notes: text()
+    notes: text(),
+    created_at: timestamp("created_at", { withTimezone: false }).defaultNow(),
+
 });
 
-export const Flashcards = pgTable('flashcards', {
+export const StudyTypeContent = pgTable('studyTypeContent', {
     id: varchar('id', {length: 255}).primaryKey(),
     studyId: varchar('study_id', {length: 255}).notNull(),
-    content: json().notNull(),
-    createdAt: varchar('created_at', {length: 255}).notNull().default('now()'),
+    content: json(),
+    type: varchar('type', {length: 50}).notNull(),
+    status: varchar('status', {length: 50}).default('Generating'),
+    created_at: timestamp("created_at", { withTimezone: false }).defaultNow(),
 });

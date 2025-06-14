@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import MaterialItemCard, { MaterialType } from './materialItemCard'
 import axios from 'axios'
+import { DrizzleStudyMaterial } from '@/lib/db/schema'
+import { useLocalStorage } from 'usehooks-ts'
 
 
 type studTypeContent = {
@@ -46,8 +48,8 @@ const items  = [
         type:"qa"
     },
 ] as ItemProp[]
-const StudyMaterialSection = ({studyId}: {studyId: string}) => {
-    const [materials, setMaterials] = React.useState<studTypeContent | null>(null);
+const StudyMaterialSection = ({studyId, studyMaterial}: {studyId: string, studyMaterial: DrizzleStudyMaterial}) => {
+    const [materials, setMaterials] = useLocalStorage<studTypeContent | undefined>('studyTypeContents',undefined);
 
     const getMaterials = async () => {
         const res = await axios.post( '/api/study-type', {
@@ -63,11 +65,17 @@ const StudyMaterialSection = ({studyId}: {studyId: string}) => {
   return (
     <div className='mt-5'>
         <h2 className='font-bold text-sm md:text-lg'>Study Materials</h2>
+        {materials &&
+
         <div className='grid grid-cols-2 md:grid-cols-4 gap-5 mt-3'>
             {items.map((item, i) => (
             <MaterialItemCard key={i} item={item}
-            studyTypeContent={materials!} studyId={studyId} />
+            studyTypeContent={materials} studyId={studyId}
+            studyMaterial={studyMaterial}
+            refreshData={getMaterials} />
+
         ))}</div>
+        }
     </div>
   )
 }

@@ -6,27 +6,24 @@ import { DrizzleStudyMaterial } from "@/lib/db/schema";
 
 export type UseStudyMaterialsResult = {
     studyMaterials: DrizzleStudyMaterial[];
-    studyMaterial: DrizzleStudyMaterial | undefined;
-    setStudyMaterialId: (id: string) => void;
-    studyMaterialId: string;
-    setStudyMaterial: (material: DrizzleStudyMaterial | undefined) => void; 
+    setStudyMaterials: (material: DrizzleStudyMaterial[] | undefined) => void;
+    totalSTM: number;
 }
 const useStudyMaterials = ():UseStudyMaterialsResult => {
-    const [studyMaterialId, setStudyMaterialId] = useLocalStorage<string>('study-material-id', '');
-    const [studyMaterial, setStudyMaterial] = useLocalStorage<DrizzleStudyMaterial | undefined>('study-material', undefined);
-    const {data: studyMaterials = []} = useQuery({
-        queryKey: ['studyMaterials'],
-        queryFn: async () => {
-            const res = await axios.get('/api/study');
-            return res.data.studyMaterials as DrizzleStudyMaterial[];
-        }
-    });
-    const arrayMaterials = Array.isArray(studyMaterials) ? studyMaterials : [];
+    const [studyMaterials, setStudyMaterials] = useLocalStorage<DrizzleStudyMaterial[] | undefined>('study-materials', undefined);
+   const[totalSTM, setTotalSTM] = useLocalStorage<number>('total-study-materials', 0);
+    const {data} = useQuery({
+            queryKey: ['studyMaterials'],
+            queryFn: async () => {
+                const res = await axios.get('/api/study');
+                  setTotalSTM(res.data.studyMaterials.length);
+                return res.data.studyMaterials as DrizzleStudyMaterial[];
+            }
+        });
+    const arrayMaterials = Array.isArray(data) ? data : [];
 
-    //  studyMaterial = arrayMaterials.find((material) => material.id === studyMaterialId);
+    return {studyMaterials: arrayMaterials,  setStudyMaterials, totalSTM};
 
-    return {studyMaterials: arrayMaterials, studyMaterial, setStudyMaterialId, studyMaterialId, setStudyMaterial};
-
-}
+};
 
 export default useStudyMaterials;
