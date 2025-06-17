@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import React from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 import StepProgress from '../stepProgress'
+import useStudyMaterial from '@/hooks/useStudyMaterial'
 
 type Note = {
     notes: string;
@@ -14,8 +15,10 @@ type Note = {
 const Notes = () => {
     const {studyId} = useParams();
     const [notes, setNotes] = useLocalStorage<Note[]>('notes', []);
-    const [stepCount, setStepCount] = useLocalStorage<number>('stepCount', 0);
-    console.log('notes', notes.length);
+    const [stepCountNotes, setStepCountNotes] = React.useState<number>( 0);
+    const {studyMaterial} = useStudyMaterial();
+    const [isLoadingStateNotes, setIsLoadingStateNotes] = React.useState<boolean>(false);
+    const [isNotesDone, setIsNotesDone] = useLocalStorage<boolean>('isNotesDone', false)
     const router = useRouter();
     const getNotes = async () => {
         const res = await axios.post('/api/study-type', {
@@ -24,32 +27,52 @@ const Notes = () => {
         });
         setNotes(res.data)
     }
+    const updateProgress = async () => {
+        if (notes.length > 0 && stepCountNotes === notes.length - 1){
+            await axios.post('/api/progress', {
+                studyId,
+                progress: studyMaterial.progress! + 25,
+            });
+            
+        }else return;
+    }
     React.useEffect(() => {
         getNotes();
+        updateProgress();
     }, []);
   return (
     <div className=''>
         {notes && (
             <StepProgress
                 data={notes.map(item => item.notes)}
-                stepCount={stepCount}
-                setStepCount={setStepCount}
+                stepCount={stepCountNotes}
+                setStepCount={setStepCountNotes}
             />
         )}
-        <div className='mt-5 w-full flex justify-center'>
+        <div className='mt-5 w-full flex justify-center items-center'>
             <div
-                className='flex flex-col w-[90%] max-w-[90vw] sm:max-w-[100%] '
-                dangerouslySetInnerHTML={{ __html: cleanNotesHTML(notes[stepCount]?.notes) }}
+                className='flex flex-col w-[90%] max-w-[90vw] sm:max-w-[90%] overflow-hidden '
+                dangerouslySetInnerHTML={{ __html: cleanNotesHTML(notes[stepCountNotes]?.notes) }}
             />
         </div>
-        {Array.isArray(notes) && notes.length > 0 && stepCount === notes.length - 1 &&
+        {Array.isArray(notes) && notes.length > 0 && stepCountNotes === notes.length - 1 &&
             <div className='flex flex-col justify-center items-center gap-2 mt-5'>
                 <h2 className=''>End of Notes</h2>
                 <Button
-                    className='cursor-pointer'
-                    onClick={() => router.back()}
+                disabled={isLoadingStateNotes || isNotesDone}
+                    className={`cursor-pointer ${isNotesDone ? 'bg-green-600 text-[#fff]' : ''}`}
+                    onClick={!isNotesDone ? async() => {
+                        setIsLoadingStateNotes(true)
+                          await axios.post('/api/progress', {
+                            studyId,
+                            progress: studyMaterial.progress! + 25,
+                          });
+                          setIsNotesDone(true)
+                          setIsLoadingStateNotes(false)
+                          router.back()
+                    } : () => null}
                 >
-                    Go to Course Page
+                    {isNotesDone ? 'Done' : 'Mark as done'}
                 </Button>
             </div>
         }

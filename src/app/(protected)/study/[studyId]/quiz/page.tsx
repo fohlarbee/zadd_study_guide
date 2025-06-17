@@ -1,10 +1,13 @@
 "use client";
 import axios from 'axios';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React from 'react'
 import StepProgress from '../stepProgress';
 import QuizCardItem from './quizCardItem';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { useLocalStorage } from 'usehooks-ts';
+import useStudyMaterial from '@/hooks/useStudyMaterial';
 
 type QuizItem = {
     question: string;
@@ -19,11 +22,15 @@ type QuizData = {
 const QuizPage = () => {
     const {studyId} = useParams();
     const [quizData, setQuizData] = React.useState<QuizData | null>(null);
-    const [stepCount, setStepCount] = React.useState<number>(0);
+    const [stepCountQuiz, setStepCountQuiz] = React.useState<number>(0);
     const [correctAnswer, setCorrectAnswer] = React.useState<string | null>(null);
     const [isCorrectAnswer, setIsCorrectAnswer] = React.useState<boolean | null>(null);
     const [shouldShowCard, setShouldShowCard] = React.useState(false);
-    
+    const [isLoadingStateQuiz, setIsLoadingStateQuiz] = React.useState<boolean>(false);
+    const [isQuizDone, setIsQuizDone] = useLocalStorage<boolean>('isQuizDone', false);
+    const {studyMaterial} = useStudyMaterial();
+    const router = useRouter();
+
     React.useEffect(() => {
         if (isCorrectAnswer !== null) {
             setShouldShowCard(false); // Start hidden for transition
@@ -65,7 +72,7 @@ const QuizPage = () => {
     React.useEffect(() => {
         setCorrectAnswer(null);
         setIsCorrectAnswer(null);
-    },[stepCount]);
+    },[stepCountQuiz]);
 
   return (
     <div>
@@ -73,8 +80,8 @@ const QuizPage = () => {
         {quizData && (
           <StepProgress
             data={quizData.content.map(item => item.question)}
-            stepCount={stepCount}
-            setStepCount={setStepCount}
+            stepCount={stepCountQuiz}
+            setStepCount={setStepCountQuiz}
           />
         )}
         <div>
@@ -82,9 +89,9 @@ const QuizPage = () => {
         {/* {quizData && quizData.content.length > 0 && quizData.content.map((item, index) => (
            <QuizCardItem key={index} />
         ))} */}
-        {quizData && quizData.content[stepCount] && (
-          <QuizCardItem quiz={quizData.content[stepCount]} 
-          handleClick={(o) => checkAnswer(o, quizData.content[stepCount])}/>
+        {quizData && quizData.content[stepCountQuiz] && (
+          <QuizCardItem quiz={quizData.content[stepCountQuiz]} 
+          handleClick={(o) => checkAnswer(o, quizData.content[stepCountQuiz])}/>
         )}
         </div>
         {isCorrectAnswer  && (
@@ -114,6 +121,27 @@ const QuizPage = () => {
                 </h2>
             </div>
         )}
+        {Array.isArray(quizData?.content) && quizData?.content.length > 0 && stepCountQuiz === quizData.content.length - 1 &&
+                  <div className='flex flex-col justify-center items-center gap-2 mt-5'>
+                      <h2 className=''>End of Quiz</h2>
+                      <Button
+                         disabled={isLoadingStateQuiz || isQuizDone}
+                    className={`cursor-pointer ${isQuizDone ? 'bg-green-600 text-[#fff]' : ''}`}
+                    onClick={!isQuizDone ? async() => {
+                        setIsLoadingStateQuiz(true)
+                          await axios.post('/api/progress', {
+                            studyId,
+                            progress: studyMaterial.progress! + 25,
+                          });
+                          setIsQuizDone(true)
+                          setIsLoadingStateQuiz(false)
+                          router.back()
+                    } : () => null}
+                >
+                    {isQuizDone ? 'Done' : 'Mark as done'}
+                      </Button>
+                  </div>
+              }
     </div>
   )
 }

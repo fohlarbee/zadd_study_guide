@@ -1,6 +1,6 @@
 "use client";
 import axios from 'axios';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 import FlashcardItem from './flashcardItem';
 import {
@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/carousel";
 import type {  UseEmblaCarouselType } from 'embla-carousel-react';
 import StepProgress from '../stepProgress';
+import useStudyMaterial from '@/hooks/useStudyMaterial';
+import { Button } from '@/components/ui/button';
+import { useLocalStorage } from 'usehooks-ts';
 
 export type Flashcard = {
     front: string,
@@ -31,8 +34,13 @@ const FlashCards = () => {
     const {studyId} = useParams();
     const [flashcards, setFlashcards] = React.useState<Flashcards | null>(null);
     const [isFlipped, setIsFlipped] = React.useState(false);
-    const [stepCount, setStepCount] = React.useState<number>(0);
+    const [stepCountFlashcards, setStepCountFlashcards] = React.useState<number>(0);
     const [api, setApi] = React.useState<CarouselApi | undefined>(undefined);
+    const [isLoadingStateFlashcards, setIsLoadingStateFlashcards] = React.useState<boolean>(false);
+    const [isFlashcardDone, setIsFlashcardDone] = useLocalStorage<boolean>('isFlashcardDone', false)
+    const {studyMaterial} = useStudyMaterial();
+    const router = useRouter();
+    
     type CarouselApi = UseEmblaCarouselType[1]
 
 
@@ -42,22 +50,27 @@ const FlashCards = () => {
       setIsFlipped(!isFlipped);
     };
     const getFlashcards = async () => {
+
        const res = await axios.post('/api/study-type', {
                   studyId,
                   studyType: "flashcards"
               });
               setFlashcards(res.data);
     };
+    
 
     React.useEffect(() => {
-        getFlashcards();
+        (async () => {
+            await getFlashcards();
+        })();
     }, []);
+
     React.useEffect(() => {
       if (!api) return;
       api.on('select', () => {
         setIsFlipped(false); 
         const selectedIndex = api.selectedScrollSnap() ;
-        setStepCount(selectedIndex);
+        setStepCountFlashcards(selectedIndex);
       })
     },[api])
   return (
@@ -67,9 +80,9 @@ const FlashCards = () => {
        {flashcards && (
           <StepProgress
             data={flashcards?.content.map(item => item.front)}
-            stepCount={stepCount}
+            stepCount={stepCountFlashcards}
             setStepCount={(idx: number) => {
-              setStepCount(idx);
+              setStepCountFlashcards(idx);
               if (api) {
                 api.scrollTo(idx);
               }
@@ -97,7 +110,7 @@ const FlashCards = () => {
                     <CarouselPrevious
                       onClick={() => {
                         if (api) {
-                          api.scrollTo(Math.max(0, stepCount - 1));
+                          api.scrollTo(Math.max(0, stepCountFlashcards - 1));
                         }
                       }}
                       className="bg-white shadow-md rounded-full p-2 hover:bg-gray-100"
@@ -107,7 +120,7 @@ const FlashCards = () => {
                     <CarouselNext
                       onClick={() => {
                         if (api && flashcards?.content) {
-                          api.scrollTo(Math.min(flashcards.content.length - 1, stepCount + 1));
+                          api.scrollTo(Math.min(flashcards.content.length - 1, stepCountFlashcards + 1));
                         }
                       }}
                       className="bg-white shadow-md rounded-full p-2 hover:bg-gray-100"
@@ -122,6 +135,27 @@ const FlashCards = () => {
           )}
           
       </div>
+       {Array.isArray(flashcards?.content) && flashcards?.content && flashcards.content.length > 0 && stepCountFlashcards === flashcards.content.length - 1 &&
+                  <div className='flex flex-col justify-center items-center gap-2 mt-5'>
+                      <h2 className=''>End of cards</h2>
+                      <Button
+                         disabled={isLoadingStateFlashcards || isFlashcardDone}
+                    className={`cursor-pointer ${isFlashcardDone ? 'bg-green-600 text-[#fff]' : ''}`}
+                    onClick={!isFlashcardDone ? async() => {
+                        setIsLoadingStateFlashcards(true)
+                          await axios.post('/api/progress', {
+                            studyId,
+                            progress: studyMaterial.progress! + 25,
+                          });
+                          setIsFlashcardDone(true)
+                          setIsLoadingStateFlashcards(false)
+                          router.back()
+                    } : () => null}
+                >
+                    {isFlashcardDone ? 'Done' : 'Mark as done'}
+                      </Button>
+                  </div>
+              }
      
     </div>
   )

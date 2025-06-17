@@ -11,6 +11,8 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import useStudyMaterials from '@/hooks/useStudyMaterials';
+import useIsMember from '@/hooks/useIsMember';
 
 type Props = {
     children: React.ReactNode;
@@ -19,9 +21,10 @@ const SidebarLayout = ({children}: Props) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const [layerOpen, setIsLayerOpen] = React.useState(false);
     const pathname = usePathname();
-
+    const { totalSTM } = useStudyMaterials();
     const [shouldShowCard, setShouldShowCard] = React.useState(false);
-    
+    const {isMember} = useIsMember();
+
      
     
 
@@ -55,12 +58,14 @@ const SidebarLayout = ({children}: Props) => {
                                         
                                         {/* <Separator/>  */}
                                         <>
-                                        <Button variant="outline" className="w-full mt-2 flex" onClick={() => setIsLayerOpen(false)}>
-                                            <Link href="/create" className="flex items-center gap-2 w-full justify-center">
-                                                <PlusSquareIcon size={24} />
-                                                    Create New
-                                            </Link>
-                                        </Button>
+                                         <Link href="/create" className="flex items-center gap-2 w-[100%] justify-center">
+                                            <Button variant="outline" className="w-full flex" onClick={() => setIsLayerOpen(false)}>
+                                                <PlusSquareIcon size={24}  />
+                                                        Create New
+                                                </Button>
+                                                
+                                          </Link>
+                                       
                                             
                                         </>
                                     </SheetHeader>
@@ -69,21 +74,24 @@ const SidebarLayout = ({children}: Props) => {
                                         {/* <div className="h-4"></div> */}
                                         <div className="flex flex-col justify-start gap-2 text-left items-start">
 
-                                        {items.map((item, index) => (
-                                            <Button key={index} 
-                                            className={cn('w-full justify-start', {
-                                                'bg-primary text-[#fff]': pathname === item.url
-                                            })}
-                                                variant="ghost" onClick={() => setIsLayerOpen(false)}>
-                                                <Link 
-                                                className="list-none flex items-center gap-2"
+                                        {items.map((item, index) => ( 
+                                            <Link 
+                                                 key={index}
+                                                className="list-none flex items-center gap-2 w-full"
                                                 href={item.url}
                                                 >
-                                                    <item.icon size={24} />
+                                                     <Button  
+                                                    className={cn('w-full justify-start', {
+                                                        'bg-primary text-[#fff]': pathname === item.url
+                                                    })}
+                                                        variant="ghost" onClick={() => setIsLayerOpen(false)}>
+                                                             <item.icon size={24} />
                                                     <span>{item.title}</span>
-                                                </Link>
-                                            </Button>
-                                        ))}
+                                               
+                                                     </Button>
+                                            </Link>
+
+                                            ))}
                                     </div>               
                                         <div className="h-4 "></div>
                                         <Separator/>                 
@@ -97,11 +105,13 @@ const SidebarLayout = ({children}: Props) => {
                                                     : "opacity-0 translate-y-4 scale-95 pointer-events-none"
                                                 )}
                                                 >
-                                                <h2 className="text-md mb-2 font-semibold">Available Credits: 5</h2>
-                                                <Progress value={30} className="mb-2 text-primary" />
-                                                <p className="text-sm text-muted-foreground">You have 5 credits remaining</p>
+                                                 <h2 className="text-md mb-2 font-semibold flex gap-2 ">Available Credits:
+                                                <span className="text-primary text-sm mt-auto mb-auto"> {isMember ? 'Unlimited' : 5 - totalSTM}</span>
+                                                </h2>
+                                                <Progress value={isMember ? (totalSTM / 100) : (totalSTM / 5) * 100} className="mb-2" />
+                                                <p className="text-sm text-muted-foreground">{isMember ? 'Unlimited Flashcards, Quiz' : `${totalSTM} out of 5 credits used`}</p>
                                                 <Link className="text-xs text-primary" href="/upgrade">
-                                                    Upgrade to create more
+                                                {isMember ? 'Manage Subscriptions' : 'Upgrade to create more'}
                                                 </Link>
                                                 </div>
                                             </div>  
