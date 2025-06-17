@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 import MaterialItemCard, { MaterialType } from './materialItemCard'
 import axios from 'axios'
 import { DrizzleStudyMaterial } from '@/lib/db/schema'
-import { useLocalStorage } from 'usehooks-ts'
 
 
 type studTypeContent = {
@@ -49,7 +48,7 @@ const items  = [
     },
 ] as ItemProp[]
 const StudyMaterialSection = ({studyId, studyMaterial}: {studyId: string, studyMaterial: DrizzleStudyMaterial}) => {
-    const [materials, setMaterials] = useLocalStorage<studTypeContent | undefined>('studyTypeContents',undefined);
+    const [materials, setMaterials] = React.useState<studTypeContent | undefined>(undefined);
 
     const getMaterials = async () => {
         const res = await axios.post( '/api/study-type', {
@@ -64,7 +63,7 @@ const StudyMaterialSection = ({studyId, studyMaterial}: {studyId: string, studyM
     },[])
   return (
     <div className='mt-5'>
-        <h2 className='font-bold text-sm md:text-lg'>Study Materials</h2>
+        <h2 className='font-bold text-lg md:text-2xl'>Study Materials</h2>
         {materials &&
 
         <div className='grid grid-cols-2 md:grid-cols-4 gap-5 mt-3'>

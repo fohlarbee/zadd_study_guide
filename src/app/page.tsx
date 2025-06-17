@@ -1,16 +1,15 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import HeroSection from "@/components/heroSection";
+import HomeBanner from "@/components/HomeBanner";
+import Navbar from "@/components/navbar";
+import OutlineSection from "@/components/outlineSection";
 
 export default function Home() {
   return (
-   <div>
-    <h1 className="text-3xl font-bold">
-      Hello world!
-      <Button>Login</Button>
-      <Button>
-        <Link href="/dashboard">Dashboard</Link>
-      </Button>
-    </h1>
-  </div>
+    <>
+      <Navbar />
+      <HomeBanner />
+      <HeroSection/>
+      <OutlineSection/>
+    </>
   );
 }

@@ -11,10 +11,13 @@ export type UseStudyMaterialsResult = {
     setStudyMaterial: (material: DrizzleStudyMaterial) => void; 
     setStudyMaterialId: (id: string) => void;
     studyMaterialId: string;
+    progress: number;
+    setProgress: (progress:number) => void;
 }
 const useStudyMaterial = ():UseStudyMaterialsResult => {
     const [studyMaterialId, setStudyMaterialId] = useLocalStorage<string>('studyMaterialId', '');
     const [studyMaterial, setStudyMaterial] = useLocalStorage<DrizzleStudyMaterial>('studyMaterial', {} as DrizzleStudyMaterial);
+    const [progress, setProgress] = useLocalStorage<number>('progress', 0)
     const {studyId} = useParams();
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -24,6 +27,7 @@ const useStudyMaterial = ():UseStudyMaterialsResult => {
             const res =  await axios.get(`/api/study?studyId=${studyId}`);
             if (res.data.studyMaterial) {
                 setStudyMaterialId(res.data.studyMaterial.courseId);
+                setProgress(res.data.studyMaterial.progress)
                 return res.data.studyMaterial as DrizzleStudyMaterial;
             }
             return null;
@@ -33,7 +37,7 @@ const useStudyMaterial = ():UseStudyMaterialsResult => {
     React.useEffect(() => {
         if (data) setStudyMaterial(data);
     }, [data, setStudyMaterial]);
-    return { studyMaterial, setStudyMaterialId, studyMaterialId, setStudyMaterial};
+    return { studyMaterial, setStudyMaterialId, studyMaterialId, setStudyMaterial, progress, setProgress};
 
 }
 

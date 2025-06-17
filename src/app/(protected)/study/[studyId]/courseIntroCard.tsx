@@ -14,7 +14,7 @@ const CourseIntroCard = ({studyMaterial}: Props) => {
       <div>
         <h2 className=' text-sm md:text-lg font-semibold'>{( studyMaterial?.courseLayout as {studyGuideTitle: string})?.studyGuideTitle}</h2>
         <p className='text-xs md:text-sm text-muted-foreground line-clamp-2'>{(studyMaterial?.courseLayout as {studySummary: string})?.studySummary}</p>
-        <Progress value={30} className='mt-3'/>
+        <Progress value={studyMaterial?.progress} className='mt-3'/>
 
         <p className='text-xs md:text-sm mt-3 line-clamp-2 text-primary'>Total Chapters: <span className=' font-bold'>
           {(studyMaterial?.courseLayout as {chapters: []})?.chapters.length}</span></p>

@@ -12,7 +12,8 @@ type StudyCourseListItemProps = {
     studyMaterial: DrizzleStudyMaterial;
 }
 const StudyCourseListItem = ({studyMaterial}: StudyCourseListItemProps) => {
-        const {setStudyMaterialId} = useStudyMaterial();
+        const {setStudyMaterialId, progress} = useStudyMaterial();
+        console.log('progress', progress)
     
   return (
     <div className='border border-sidebar-border rounded-lg p-5 transition-colors duration-200 cursor-pointer hover:bg-secondary shadow-lg'>
@@ -20,12 +21,13 @@ const StudyCourseListItem = ({studyMaterial}: StudyCourseListItemProps) => {
             <div className='flex justify-between items-center'>
                 <Image src='/knowledge.png' alt={studyMaterial.topic} 
                 width={50} height={50}/>
-                <p className='text-[10px] text-[#fff] p-1 px-2 rounded-full bg-primary shadow-2xl'>7 June 2025</p>
+                <p className='text-[10px] text-[#fff] p-1 px-2 rounded-full bg-primary shadow-2xl'>{
+                    studyMaterial?.created_at ? new Date(studyMaterial.created_at).toLocaleDateString() : ''}</p>
             </div>
             <h2 className='font-semibold mt-2 text-sm line-clamp-1'>{(studyMaterial.courseLayout as {studyGuideTitle: string}).studyGuideTitle}</h2>
             <p className='text-xs text-muted-foreground line-clamp-2 mt-2'>{(studyMaterial.courseLayout as { studySummary: string }).studySummary}</p>
             <div className='flex items-center justify-between mt-2'>
-                <Progress value={30}/>
+                <Progress value={studyMaterial.progress}/>
             </div>
             <div className='flex items-center justify-end mt-2 '>
                 {studyMaterial.status === 'Generating'

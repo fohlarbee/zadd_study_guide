@@ -10,6 +10,8 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import useRefresh from '@/hooks/useRefresh';
+import useStudyMaterials from '@/hooks/useStudyMaterials';
+import useIsMember from '@/hooks/useIsMember';
 
 const Create = () => {
     const [step, setStep] = useLocalStorage<number>("step", 0);
@@ -17,6 +19,9 @@ const Create = () => {
     const [loading, setLoading] = useLocalStorage<boolean>('loading',false);
     const router = useRouter();
     const refresh = useRefresh();
+    const {totalSTM} = useStudyMaterials();
+    const {isMember} = useIsMember();
+    
 
     const mutation = useMutation({
         mutationFn: async (data: Record<string, string>) => {
@@ -80,8 +85,13 @@ const Create = () => {
            onClick={() => setStep(step - 1)} variant='outline'>Previous</Button> : " -"}
            {step === 0 ? (<Button
            onClick={() => setStep(step + 1)}>Next</Button>) : (<Button 
-            disabled={loading}
-           onClick={generateStudyOutline}>{loading ? <Loader2Icon className="animate-spin" /> : "Generate"}</Button>)} 
+            disabled={loading || totalSTM >= 5 && !isMember}
+           onClick={
+            totalSTM >= 5 && !isMember ?
+            () => toast.error('Upgrade to a paid plan')
+            :
+            () => generateStudyOutline()
+            }>{loading ? <Loader2Icon className="animate-spin" /> : "Generate"}</Button>)} 
         </div>
     </div>
    
