@@ -8,14 +8,14 @@ import axios from "axios";
 const SyncUser = async() => {
     const {userId} = await auth();
     if (!userId) throw new Error("User not found");
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_URL as string;
 
     const client = await clerkClient();
     const clerkUser = await client.users.getUser(userId);
 
 
 
-    const res = await axios.post(`${baseUrl}/api/create-user`, {clerkUser});
+     await axios.post(`${baseUrl}/api/create-user`, {clerkUser});
 
 
     return redirect('/dashboard');
