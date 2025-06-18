@@ -12,8 +12,7 @@ type StudyCourseListItemProps = {
     studyMaterial: DrizzleStudyMaterial;
 }
 const StudyCourseListItem = ({studyMaterial}: StudyCourseListItemProps) => {
-        const {setStudyMaterialId, progress} = useStudyMaterial();
-        console.log('progress', progress)
+        const {setStudyMaterialId} = useStudyMaterial();
     
   return (
     <div className='border border-sidebar-border rounded-lg p-5 transition-colors duration-200 cursor-pointer hover:bg-secondary shadow-lg'>

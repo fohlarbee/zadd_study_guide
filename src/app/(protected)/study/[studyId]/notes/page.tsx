@@ -10,6 +10,7 @@ import useStudyMaterial from '@/hooks/useStudyMaterial'
 
 type Note = {
     notes: string;
+    completed: boolean;
 };
 
 const Notes = () => {
@@ -18,7 +19,6 @@ const Notes = () => {
     const [stepCountNotes, setStepCountNotes] = React.useState<number>( 0);
     const {studyMaterial} = useStudyMaterial();
     const [isLoadingStateNotes, setIsLoadingStateNotes] = React.useState<boolean>(false);
-    const [isNotesDone, setIsNotesDone] = useLocalStorage<boolean>('isNotesDone', false)
     const router = useRouter();
     const getNotes = async () => {
         const res = await axios.post('/api/study-type', {
@@ -27,18 +27,11 @@ const Notes = () => {
         });
         setNotes(res.data)
     }
-    const updateProgress = async () => {
-        if (notes.length > 0 && stepCountNotes === notes.length - 1){
-            await axios.post('/api/progress', {
-                studyId,
-                progress: studyMaterial.progress! + 25,
-            });
-            
-        }else return;
-    }
+
+  
     React.useEffect(() => {
         getNotes();
-        updateProgress();
+   
     }, []);
   return (
     <div className=''>
@@ -59,20 +52,21 @@ const Notes = () => {
             <div className='flex flex-col justify-center items-center gap-2 mt-5'>
                 <h2 className=''>End of Notes</h2>
                 <Button
-                disabled={isLoadingStateNotes || isNotesDone}
-                    className={`cursor-pointer ${isNotesDone ? 'bg-green-600 text-[#fff]' : ''}`}
-                    onClick={!isNotesDone ? async() => {
+                disabled={isLoadingStateNotes || notes[notes.length - 1].completed === true}
+                    className={`cursor-pointer ${notes[notes.length - 1].completed === true ? 'bg-green-600 text-[#fff]' : ''}`}
+                    onClick={!notes[notes.length - 1].completed === true ? async() => {
                         setIsLoadingStateNotes(true)
                           await axios.post('/api/progress', {
                             studyId,
                             progress: studyMaterial.progress! + 25,
+                            type:'notes'
                           });
-                          setIsNotesDone(true)
+                         
                           setIsLoadingStateNotes(false)
                           router.back()
                     } : () => null}
                 >
-                    {isNotesDone ? 'Done' : 'Mark as done'}
+                    {notes[notes.length - 1].completed === true ? 'Done' : 'Mark as done'}
                 </Button>
             </div>
         }

@@ -6,7 +6,6 @@ import StepProgress from '../stepProgress';
 import QuizCardItem from './quizCardItem';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useLocalStorage } from 'usehooks-ts';
 import useStudyMaterial from '@/hooks/useStudyMaterial';
 
 type QuizItem = {
@@ -16,20 +15,22 @@ type QuizItem = {
 };
 type QuizData = {
     content: QuizItem[];
+    completed: boolean;
 };
 
 
 const QuizPage = () => {
     const {studyId} = useParams();
-    const [quizData, setQuizData] = React.useState<QuizData | null>(null);
+    const [quizData, setQuizData] = React.useState<QuizData | undefined>(undefined);
     const [stepCountQuiz, setStepCountQuiz] = React.useState<number>(0);
     const [correctAnswer, setCorrectAnswer] = React.useState<string | null>(null);
     const [isCorrectAnswer, setIsCorrectAnswer] = React.useState<boolean | null>(null);
     const [shouldShowCard, setShouldShowCard] = React.useState(false);
     const [isLoadingStateQuiz, setIsLoadingStateQuiz] = React.useState<boolean>(false);
-    const [isQuizDone, setIsQuizDone] = useLocalStorage<boolean>('isQuizDone', false);
     const {studyMaterial} = useStudyMaterial();
     const router = useRouter();
+    
+    // console.log('QuizData, quizData', quizData);
 
     React.useEffect(() => {
         if (isCorrectAnswer !== null) {
@@ -48,13 +49,15 @@ const QuizPage = () => {
                     studyId,
                     studyType: "quiz"
                 });
-                console.log(res.data);
+            // console.log('Quiz Data:', res.data);
             setQuizData(res.data);
         };
 
     React.useEffect(() => {
-        getQuiz();
-    },[studyId]);
+        (async () => {
+            await getQuiz();    
+        })();
+    }, [studyId]);
 
     const checkAnswer = (option: string, currentQuestion: QuizItem) => {
 
@@ -79,19 +82,17 @@ const QuizPage = () => {
         <h2 className=' text-lg md:text-2xl font-bold mb-5 text-center'>Quiz</h2>
         {quizData && (
           <StepProgress
-            data={quizData.content.map(item => item.question)}
+            data={quizData?.content.map(item => item.question)}
             stepCount={stepCountQuiz}
             setStepCount={setStepCountQuiz}
           />
         )}
         <div>
 
-        {/* {quizData && quizData.content.length > 0 && quizData.content.map((item, index) => (
-           <QuizCardItem key={index} />
-        ))} */}
-        {quizData && quizData.content[stepCountQuiz] && (
-          <QuizCardItem quiz={quizData.content[stepCountQuiz]} 
-          handleClick={(o) => checkAnswer(o, quizData.content[stepCountQuiz])}/>
+      
+        {quizData?.content && quizData?.content[stepCountQuiz] && (
+          <QuizCardItem quiz={quizData?.content[stepCountQuiz]} 
+          handleClick={(o) => checkAnswer(o, quizData?.content[stepCountQuiz])}/>
         )}
         </div>
         {isCorrectAnswer  && (
@@ -121,24 +122,24 @@ const QuizPage = () => {
                 </h2>
             </div>
         )}
-        {Array.isArray(quizData?.content) && quizData?.content.length > 0 && stepCountQuiz === quizData.content.length - 1 &&
+        {Array.isArray(quizData?.content) && quizData?.content.length > 0 && stepCountQuiz === quizData?.content.length - 1 &&
                   <div className='flex flex-col justify-center items-center gap-2 mt-5'>
                       <h2 className=''>End of Quiz</h2>
                       <Button
-                         disabled={isLoadingStateQuiz || isQuizDone}
-                    className={`cursor-pointer ${isQuizDone ? 'bg-green-600 text-[#fff]' : ''}`}
-                    onClick={!isQuizDone ? async() => {
+                         disabled={isLoadingStateQuiz || quizData?.completed}
+                    className={`cursor-pointer ${quizData?.completed ? 'bg-green-600 text-[#fff]' : ''}`}
+                    onClick={!quizData?.completed ? async() => {
                         setIsLoadingStateQuiz(true)
                           await axios.post('/api/progress', {
                             studyId,
                             progress: studyMaterial.progress! + 25,
+                            type: 'quiz'
                           });
-                          setIsQuizDone(true)
                           setIsLoadingStateQuiz(false)
                           router.back()
                     } : () => null}
                 >
-                    {isQuizDone ? 'Done' : 'Mark as done'}
+                    {quizData?.completed ? 'Done' : 'Mark as done'}
                       </Button>
                   </div>
               }
