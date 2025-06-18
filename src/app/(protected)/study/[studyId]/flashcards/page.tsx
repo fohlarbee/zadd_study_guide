@@ -14,7 +14,6 @@ import type {  UseEmblaCarouselType } from 'embla-carousel-react';
 import StepProgress from '../stepProgress';
 import useStudyMaterial from '@/hooks/useStudyMaterial';
 import { Button } from '@/components/ui/button';
-import { useLocalStorage } from 'usehooks-ts';
 
 export type Flashcard = {
     front: string,
@@ -28,6 +27,7 @@ export type Flashcards = {
   type: string;
   status: string;
   created_at: string;
+  completed: boolean;
 };
 
 const FlashCards = () => {
@@ -37,7 +37,6 @@ const FlashCards = () => {
     const [stepCountFlashcards, setStepCountFlashcards] = React.useState<number>(0);
     const [api, setApi] = React.useState<CarouselApi | undefined>(undefined);
     const [isLoadingStateFlashcards, setIsLoadingStateFlashcards] = React.useState<boolean>(false);
-    const [isFlashcardDone, setIsFlashcardDone] = useLocalStorage<boolean>('isFlashcardDone', false)
     const {studyMaterial} = useStudyMaterial();
     const router = useRouter();
     
@@ -139,20 +138,21 @@ const FlashCards = () => {
                   <div className='flex flex-col justify-center items-center gap-2 mt-5'>
                       <h2 className=''>End of cards</h2>
                       <Button
-                         disabled={isLoadingStateFlashcards || isFlashcardDone}
-                    className={`cursor-pointer ${isFlashcardDone ? 'bg-green-600 text-[#fff]' : ''}`}
-                    onClick={!isFlashcardDone ? async() => {
+                         disabled={isLoadingStateFlashcards || flashcards.completed}
+                    className={`cursor-pointer ${ flashcards.completed ? 'bg-green-600 text-[#fff]' : ''}`}
+                    onClick={!flashcards.completed ? async() => {
                         setIsLoadingStateFlashcards(true)
                           await axios.post('/api/progress', {
                             studyId,
                             progress: studyMaterial.progress! + 25,
+                            type:'flashcards'
                           });
-                          setIsFlashcardDone(true)
+                         
                           setIsLoadingStateFlashcards(false)
                           router.back()
                     } : () => null}
                 >
-                    {isFlashcardDone ? 'Done' : 'Mark as done'}
+                    { flashcards.completed ? 'Done' : 'Mark as done'}
                       </Button>
                   </div>
               }

@@ -30,6 +30,7 @@ export const studyNotes = pgTable('study_notes', {
     studyId: varchar().notNull(),
     chapterId: varchar().notNull(),
     notes: text(),
+    completed: boolean('completed').default(false),
     created_at: timestamp("created_at", { withTimezone: false }).defaultNow(),
 
 });
@@ -40,6 +41,7 @@ export const StudyTypeContent = pgTable('studyTypeContent', {
     content: json(),
     type: varchar('type', {length: 50}).notNull(),
     status: varchar('status', {length: 50}).default('Generating'),
+    completed: boolean('completed').default(false),
     created_at: timestamp("created_at", { withTimezone: false }).defaultNow(),
 });
 
