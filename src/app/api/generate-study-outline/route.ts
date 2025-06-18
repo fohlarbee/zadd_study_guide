@@ -14,6 +14,10 @@ export const POST = async (req: Request) => {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const user = await db.select().from(Users).where(eq(Users.id, userId));
 
+    if (!user[0]) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+}
+
     const studyMaterials = await db.select()
     .from(StudyMaterial)
     .where(eq(StudyMaterial.userId, userId));
