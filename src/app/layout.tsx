@@ -5,8 +5,13 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 import QueryProvider from "@/lib/providers/queryProvider";
 
-
-const outfit = Outfit({subsets: ["latin"], variable: "--font-outfit"});
+// Configure Outfit font with fallbacks and display swap for better performance
+const outfit = Outfit({
+  subsets: ["latin"], 
+  variable: "--font-outfit",
+  display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+});
 
 export const metadata: Metadata = {
   title: "Zadd Study Guide",
